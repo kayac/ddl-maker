@@ -1,0 +1,4 @@
+package: github.com/kayac/ddl-maker
+import:
+- package: github.com/pkg/errors
+- package: github.com/serenize/snaker
