@@ -2,6 +2,8 @@
 
 ddl-maker is generate ddl from Go struct.
 
+[![Build Status](https://travis-ci.org/kayac/ddl-maker.svg?branch=add-travis-config)](https://travis-ci.org/kayac/ddl-maker)
+
 # How to use
 
 **_example/example.go**
