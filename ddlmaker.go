@@ -42,6 +42,10 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 	pkgs := make(map[string]bool, 0)
 
 	for _, s := range ss {
+		if s == nil {
+			return fmt.Errorf("nil is not supported")
+		}
+
 		rt := reflect.TypeOf(s)
 		structName := fmt.Sprintf("%s.%s", rt.PkgPath(), rt.Name())
 		if pkgs[structName] {

@@ -66,6 +66,11 @@ func TestAddStruct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	err = dm.AddStruct(nil)
+	if err == nil {
+		t.Fatal("nil is not support")
+	}
+
 	dm.AddStruct(Test1{}, Test2{})
 	if len(dm.Structs) != 2 {
 		t.Fatal("[error] add stuct")
