@@ -50,7 +50,7 @@ func main() {
 	}
 
 	structs := []interface{}{
-		ex.User{},
+		&ex.User{},
 		ex.Entry{},
 		ex.PlayerComment{},
 		ex.Bookmark{},

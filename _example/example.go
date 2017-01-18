@@ -15,11 +15,11 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-func (u User) Table() string {
+func (u *User) Table() string {
 	return "player"
 }
 
-func (u User) PrimaryKey() dialect.PrimaryKey {
+func (u *User) PrimaryKey() dialect.PrimaryKey {
 	return mysql.AddPrimaryKey("id")
 }
 

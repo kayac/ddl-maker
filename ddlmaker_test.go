@@ -26,12 +26,12 @@ func (t1 Test1) PrimaryKey() dialect.PrimaryKey {
 type Test2 struct {
 	ID        uint64
 	Test1ID   uint64
-	Comment   sql.NullString
+	Comment   sql.NullString `ddl:"null"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func (t2 Test2) PrimaryKey() dialect.PrimaryKey {
+func (t2 *Test2) PrimaryKey() dialect.PrimaryKey {
 	return mysql.AddPrimaryKey("id", "created_at")
 }
 
@@ -92,6 +92,20 @@ CREATE TABLE %s (
 
 %s`, m.HeaderTemplate(), m.Quote("test1"), m.Quote("test1"), m.Quote("id"), m.Quote("name"), m.Quote("created_at"), m.Quote("updated_at"), m.Quote("id"), m.FooterTemplate())
 
+	generatedDDL2 := fmt.Sprintf(`%s
+DROP TABLE IF EXISTS %s;
+
+CREATE TABLE %s (
+    %s BIGINT unsigned NOT NULL,
+    %s BIGINT unsigned NOT NULL,
+    %s VARCHAR(191) NULL,
+    %s DATETIME NOT NULL,
+    %s DATETIME NOT NULL,
+    PRIMARY KEY (%s, %s)
+) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
+
+%s`, m.HeaderTemplate(), m.Quote("test2"), m.Quote("test2"), m.Quote("id"), m.Quote("test1_id"), m.Quote("comment"), m.Quote("created_at"), m.Quote("updated_at"), m.Quote("id"), m.Quote("created_at"), m.FooterTemplate())
+
 	tmpFile, err := ioutil.TempFile("", "create_ddl_")
 
 	if err != nil {
@@ -128,5 +142,39 @@ CREATE TABLE %s (
 
 	if string(b) != generatedDDL {
 		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", string(b), generatedDDL)
+	}
+
+	tmpFile2, err := ioutil.TempFile("", "create_ddl2_")
+	if err != nil {
+		t.Fatal("error create tmp file", err)
+	}
+	defer os.Remove(tmpFile2.Name())
+
+	dm2, err := NewMaker(Config{
+		OutFilePath: tmpFile2.Name(),
+		DB: DBConfig{
+			Driver:  "mysql",
+			Engine:  "InnoDB",
+			Charset: "utf8mb4",
+		},
+	})
+
+	err = dm2.AddStruct(&Test2{})
+	if err != nil {
+		t.Fatal("error add pointer struct", err)
+	}
+
+	err = dm2.Generate()
+	if err != nil {
+		t.Fatal("error generate ddl", err)
+	}
+
+	b2, err := ioutil.ReadFile(tmpFile2.Name())
+	if err != nil {
+		t.Fatal("error read file", err)
+	}
+
+	if string(b2) != generatedDDL2 {
+		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", string(b2), generatedDDL2)
 	}
 }
