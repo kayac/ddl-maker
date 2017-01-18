@@ -26,7 +26,7 @@ type Index interface {
 
 func (dm *DDLMaker) parse() error {
 	for _, s := range dm.Structs {
-		rt := reflect.TypeOf(s)
+		rt := reflect.Indirect(reflect.ValueOf(s)).Type()
 
 		var columns []dialect.Column
 		for i := 0; i < rt.NumField(); i++ {
@@ -72,7 +72,7 @@ func parseTable(s interface{}, columns []dialect.Column, d dialect.Dialect) dial
 	if v, ok := s.(Table); ok {
 		tableName = snaker.CamelToSnake(v.Table())
 	} else {
-		tableName = snaker.CamelToSnake(reflect.TypeOf(s).Name())
+		tableName = snaker.CamelToSnake(reflect.Indirect(reflect.ValueOf(s)).Type().Name())
 	}
 	if v, ok := s.(PrimaryKey); ok {
 		primaryKey = v.PrimaryKey()
