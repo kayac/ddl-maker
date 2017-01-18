@@ -235,22 +235,22 @@ ___
 
 ## MySQL and Golang Type  Correspondence table
 
- |      Golang Type       |   MySQL Column    |
- | :--------------------: | :---------------: |
- |          int8          |      TINYINT      |
- |         int16          |     SMALLINT      |
- |       int32       |      INTGER       |
- |         int64          |      BIGINT       |
- |         uint8          | TINYINT unsigned  |
- |         uint16         | SMALLINT unsigned |
- |      uint32       | INTEGER unsigned  |
- |         uint64         |  BIGINT unsigned  |
- |        float32         |       FLOAT       |
- |        float64         |      DOUBLDE      |
- | string, sql.NullString |      VARCHAR      |
- |          bool          |    TINYINT(1)     |
- |       time.Time        |     DATETIME      |
-
+|      Golang Type       |   MySQL Column    |
+| :--------------------: | :---------------: |
+|          int8          |      TINYINT      |
+|         int16          |     SMALLINT      |
+|       int32       |      INTGER       |
+|         int64          |      BIGINT       |
+|         uint8          | TINYINT unsigned  |
+|         uint16         | SMALLINT unsigned |
+|      uint32       | INTEGER unsigned  |
+|         uint64         |  BIGINT unsigned  |
+|        float32         |       FLOAT       |
+|        float64         |      DOUBLDE      |
+| string, sql.NullString |      VARCHAR      |
+|          bool          |    TINYINT(1)     |
+|       time.Time        |     DATETIME      |
+ 
 ## Option using Golang Struct Tag Field's
 
 tag prefix is `ddl`
