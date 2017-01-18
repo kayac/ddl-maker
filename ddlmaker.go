@@ -25,13 +25,13 @@ type DDLMaker struct {
 }
 
 // NewMaker return DDLMaker
-func NewMaker(conf Config) (DDLMaker, error) {
+func NewMaker(conf Config) (*DDLMaker, error) {
 	dialect, err := dialect.NewDialect(conf.DB.Driver, conf.DB.Engine, conf.DB.Charset)
 	if err != nil {
-		return DDLMaker{}, errors.Wrap(err, "error NewDialect()")
+		return nil, errors.Wrap(err, "error NewDialect()")
 	}
 
-	return DDLMaker{
+	return &DDLMaker{
 		config:  conf,
 		Dialect: dialect,
 	}, nil
@@ -56,7 +56,7 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 }
 
 // Generate ddl file
-func (dm DDLMaker) Generate() error {
+func (dm *DDLMaker) Generate() error {
 	log.Printf("start generate %s \n", dm.config.OutFilePath)
 	err := dm.parse()
 	if err != nil {
@@ -71,7 +71,7 @@ func (dm DDLMaker) Generate() error {
 	return nil
 }
 
-func (dm DDLMaker) generate() error {
+func (dm *DDLMaker) generate() error {
 	header, err := template.New("header").Parse(dm.Dialect.HeaderTemplate())
 	if err != nil {
 		return errors.Wrap(err, "error parse header template")
