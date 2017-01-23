@@ -2,6 +2,7 @@ package ddlmaker
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"reflect"
@@ -25,13 +26,13 @@ type DDLMaker struct {
 }
 
 // NewMaker return DDLMaker
-func NewMaker(conf Config) (DDLMaker, error) {
+func NewMaker(conf Config) (*DDLMaker, error) {
 	dialect, err := dialect.NewDialect(conf.DB.Driver, conf.DB.Engine, conf.DB.Charset)
 	if err != nil {
-		return DDLMaker{}, errors.Wrap(err, "error NewDialect()")
+		return nil, errors.Wrap(err, "error NewDialect()")
 	}
 
-	return DDLMaker{
+	return &DDLMaker{
 		config:  conf,
 		Dialect: dialect,
 	}, nil
@@ -42,7 +43,13 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 	pkgs := make(map[string]bool, 0)
 
 	for _, s := range ss {
-		rt := reflect.TypeOf(s)
+		if s == nil {
+			return fmt.Errorf("nil is not supported")
+		}
+
+		val := reflect.Indirect(reflect.ValueOf(s))
+		rt := val.Type()
+
 		structName := fmt.Sprintf("%s.%s", rt.PkgPath(), rt.Name())
 		if pkgs[structName] {
 			return fmt.Errorf("%s is already added", structName)
@@ -56,22 +63,30 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 }
 
 // Generate ddl file
-func (dm DDLMaker) Generate() error {
+func (dm *DDLMaker) Generate() error {
 	log.Printf("start generate %s \n", dm.config.OutFilePath)
 	err := dm.parse()
 	if err != nil {
 		return errors.Wrap(err, "error parse")
 	}
 
-	err = dm.generate()
+	file, err := os.Create(dm.config.OutFilePath)
+	if err != nil {
+		return errors.Wrap(err, "error create ddl file")
+	}
+	defer file.Close()
+
+	err = dm.generate(file)
 	if err != nil {
 		return errors.Wrap(err, "error generate")
 	}
 
+	log.Printf("done generate %s \n", dm.config.OutFilePath)
+
 	return nil
 }
 
-func (dm DDLMaker) generate() error {
+func (dm *DDLMaker) generate(w io.Writer) error {
 	header, err := template.New("header").Parse(dm.Dialect.HeaderTemplate())
 	if err != nil {
 		return errors.Wrap(err, "error parse header template")
@@ -87,22 +102,14 @@ func (dm DDLMaker) generate() error {
 		return errors.Wrap(err, "error parse template")
 	}
 
-	file, err := os.Create(dm.config.OutFilePath)
-	if err != nil {
-		return errors.Wrap(err, "error create ddl file")
-	}
-	defer file.Close()
-
-	header.Execute(file, nil)
+	header.Execute(w, nil)
 	for _, table := range dm.Tables {
-		err := tmpl.Execute(file, table)
+		err := tmpl.Execute(w, table)
 		if err != nil {
 			return errors.Wrap(err, "template execute error")
 		}
 	}
-	footer.Execute(file, nil)
-
-	log.Printf("done generate %s \n", dm.config.OutFilePath)
+	footer.Execute(w, nil)
 
 	return nil
 }

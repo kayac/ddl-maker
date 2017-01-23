@@ -1,10 +1,9 @@
 package ddlmaker
 
 import (
+	"bytes"
 	"database/sql"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -66,6 +65,11 @@ func TestAddStruct(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	err = dm.AddStruct(nil)
+	if err == nil {
+		t.Fatal("nil is not support")
+	}
+
 	dm.AddStruct(Test1{}, Test2{})
 	if len(dm.Structs) != 2 {
 		t.Fatal("[error] add stuct")
@@ -106,15 +110,7 @@ CREATE TABLE %s (
 
 %s`, m.HeaderTemplate(), m.Quote("test2"), m.Quote("test2"), m.Quote("id"), m.Quote("test1_id"), m.Quote("comment"), m.Quote("created_at"), m.Quote("updated_at"), m.Quote("id"), m.Quote("created_at"), m.FooterTemplate())
 
-	tmpFile, err := ioutil.TempFile("", "create_ddl_")
-
-	if err != nil {
-		t.Fatal("error create tmp file", err)
-	}
-	defer os.Remove(tmpFile.Name())
-
 	dm, err := NewMaker(Config{
-		OutFilePath: tmpFile.Name(),
 		DB: DBConfig{
 			Driver:  "mysql",
 			Engine:  "InnoDB",
@@ -125,33 +121,24 @@ CREATE TABLE %s (
 		t.Fatal("error new maker", err)
 	}
 
-	err = dm.AddStruct(Test1{})
+	err = dm.AddStruct(&Test1{})
 	if err != nil {
 		t.Fatal("error add struct", err)
 	}
+	dm.parse()
 
-	err = dm.Generate()
+	var ddl1 bytes.Buffer
+	err = dm.generate(&ddl1)
 	if err != nil {
 		t.Fatal("error generate ddl", err)
 	}
 
-	b, err := ioutil.ReadFile(tmpFile.Name())
-	if err != nil {
-		t.Fatal("error read file", err)
+	if ddl1.String() != generatedDDL {
+		t.Log(ddl1.String())
+		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", ddl1.String(), generatedDDL)
 	}
-
-	if string(b) != generatedDDL {
-		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", string(b), generatedDDL)
-	}
-
-	tmpFile2, err := ioutil.TempFile("", "create_ddl2_")
-	if err != nil {
-		t.Fatal("error create tmp file", err)
-	}
-	defer os.Remove(tmpFile2.Name())
 
 	dm2, err := NewMaker(Config{
-		OutFilePath: tmpFile2.Name(),
 		DB: DBConfig{
 			Driver:  "mysql",
 			Engine:  "InnoDB",
@@ -163,18 +150,18 @@ CREATE TABLE %s (
 	if err != nil {
 		t.Fatal("error add pointer struct", err)
 	}
+	err = dm2.parse()
+	if err != nil {
+		t.Fatal("error parse file", err)
+	}
 
-	err = dm2.Generate()
+	var ddl2 bytes.Buffer
+	err = dm2.generate(&ddl2)
 	if err != nil {
 		t.Fatal("error generate ddl", err)
 	}
 
-	b2, err := ioutil.ReadFile(tmpFile2.Name())
-	if err != nil {
-		t.Fatal("error read file", err)
-	}
-
-	if string(b2) != generatedDDL2 {
-		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", string(b2), generatedDDL2)
+	if ddl2.String() != generatedDDL2 {
+		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", ddl2.String(), generatedDDL2)
 	}
 }

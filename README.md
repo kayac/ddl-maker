@@ -195,6 +195,9 @@ CREATE TABLE `entry` (
     `content` VARCHAR(191) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    INDEX `created_at_idx` (`created_at`),
+    INDEX `title_idx` (`title`),
+    UNIQUE `created_at_uniq_idx` (`created_at`),
     PRIMARY KEY (`id`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -208,6 +211,7 @@ CREATE TABLE `player_comment` (
     `comment` VARCHAR(99) NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    INDEX `player_id_entry_id_idx` (`player_id`, `entry_id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -220,6 +224,7 @@ CREATE TABLE `bookmark` (
     `entry_id` INTEGER NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    UNIQUE `user_id_entry_id` (`user_id`, `entry_id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -250,7 +255,7 @@ ___
 | string, sql.NullString |      VARCHAR      |
 |          bool          |    TINYINT(1)     |
 |       time.Time        |     DATETIME      |
- 
+
 ## Option using Golang Struct Tag Field's
 
 tag prefix is `ddl`
