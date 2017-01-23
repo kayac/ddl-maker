@@ -2,6 +2,7 @@ package ddlmaker
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"reflect"
@@ -46,7 +47,9 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 			return fmt.Errorf("nil is not supported")
 		}
 
-		rt := reflect.TypeOf(s)
+		val := reflect.Indirect(reflect.ValueOf(s))
+		rt := val.Type()
+
 		structName := fmt.Sprintf("%s.%s", rt.PkgPath(), rt.Name())
 		if pkgs[structName] {
 			return fmt.Errorf("%s is already added", structName)
@@ -67,15 +70,23 @@ func (dm *DDLMaker) Generate() error {
 		return errors.Wrap(err, "error parse")
 	}
 
-	err = dm.generate()
+	file, err := os.Create(dm.config.OutFilePath)
+	if err != nil {
+		return errors.Wrap(err, "error create ddl file")
+	}
+	defer file.Close()
+
+	err = dm.generate(file)
 	if err != nil {
 		return errors.Wrap(err, "error generate")
 	}
 
+	log.Printf("done generate %s \n", dm.config.OutFilePath)
+
 	return nil
 }
 
-func (dm *DDLMaker) generate() error {
+func (dm *DDLMaker) generate(w io.Writer) error {
 	header, err := template.New("header").Parse(dm.Dialect.HeaderTemplate())
 	if err != nil {
 		return errors.Wrap(err, "error parse header template")
@@ -91,22 +102,14 @@ func (dm *DDLMaker) generate() error {
 		return errors.Wrap(err, "error parse template")
 	}
 
-	file, err := os.Create(dm.config.OutFilePath)
-	if err != nil {
-		return errors.Wrap(err, "error create ddl file")
-	}
-	defer file.Close()
-
-	header.Execute(file, nil)
+	header.Execute(w, nil)
 	for _, table := range dm.Tables {
-		err := tmpl.Execute(file, table)
+		err := tmpl.Execute(w, table)
 		if err != nil {
 			return errors.Wrap(err, "template execute error")
 		}
 	}
-	footer.Execute(file, nil)
-
-	log.Printf("done generate %s \n", dm.config.OutFilePath)
+	footer.Execute(w, nil)
 
 	return nil
 }
