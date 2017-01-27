@@ -6,13 +6,13 @@ import (
 	"github.com/kayac/ddl-maker/dialect/mysql"
 )
 
-func TestNewDialect(t *testing.T) {
-	_, err := NewDialect("", "", "")
+func TestNew(t *testing.T) {
+	_, err := New("", "", "")
 	if err == nil {
 		t.Fatal("error not set driver")
 	}
 
-	_, err = NewDialect("mysql", "", "")
+	_, err = New("mysql", "", "")
 	if err != nil {
 		t.Fatalf("error new dialect:%s error", "mysql")
 	}

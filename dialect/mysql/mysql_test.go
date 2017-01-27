@@ -26,16 +26,16 @@ func TestToSQL(t *testing.T) {
 		}
 	}
 
-	if m.ToSQL("string", 0) != fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "string", fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize), m.ToSQL("string", 0))
+	if m.ToSQL("string", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
+		t.Fatalf("error %s to sql %s. but result %s", "string", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("string", 0))
 	}
 
-	if m.ToSQL("*string", 0) != fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "*string", fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize), m.ToSQL("*string", 0))
+	if m.ToSQL("*string", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
+		t.Fatalf("error %s to sql %s. but result %s", "*string", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("*string", 0))
 	}
 
-	if m.ToSQL("sql.NullString", 0) != fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "sql.NullString", fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize), m.ToSQL("sql.NullString", 0))
+	if m.ToSQL("sql.NullString", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
+		t.Fatalf("error %s to sql %s. but result %s", "sql.NullString", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("sql.NullString", 0))
 	}
 
 	size := uint64(10)
@@ -58,8 +58,8 @@ func TestQuote(t *testing.T) {
 
 func TestAuotIncrement(t *testing.T) {
 	m := MySQL{}
-	if m.AutoIncrement() != mysqlAutoIncreament {
-		t.Fatalf("error auto increament: %s. result:%s", mysqlAutoIncreament, m.AutoIncrement())
+	if m.AutoIncrement() != autoIncrement {
+		t.Fatalf("error auto increament: %s. result:%s", autoIncrement, m.AutoIncrement())
 	}
 }
 

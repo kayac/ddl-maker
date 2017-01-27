@@ -24,7 +24,7 @@ type Index interface {
 	Indexes() dialect.Indexes
 }
 
-func (dm *DDLMaker) parse() error {
+func (dm *DDLMaker) parse() {
 	for _, s := range dm.Structs {
 		val := reflect.Indirect(reflect.ValueOf(s))
 		rt := val.Type()
@@ -39,8 +39,6 @@ func (dm *DDLMaker) parse() error {
 		table := parseTable(s, columns, dm.Dialect)
 		dm.Tables = append(dm.Tables, table)
 	}
-
-	return nil
 }
 
 func parseField(field reflect.StructField, d dialect.Dialect) dialect.Column {

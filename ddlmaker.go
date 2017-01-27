@@ -25,22 +25,22 @@ type DDLMaker struct {
 	Tables  []dialect.Table
 }
 
-// NewMaker return DDLMaker
-func NewMaker(conf Config) (*DDLMaker, error) {
-	dialect, err := dialect.NewDialect(conf.DB.Driver, conf.DB.Engine, conf.DB.Charset)
+// New creates a DDLMaker and returns it.
+func New(conf Config) (*DDLMaker, error) {
+	d, err := dialect.New(conf.DB.Driver, conf.DB.Engine, conf.DB.Charset)
 	if err != nil {
-		return nil, errors.Wrap(err, "error NewDialect()")
+		return nil, errors.Wrap(err, "error dialect.New()")
 	}
 
 	return &DDLMaker{
 		config:  conf,
-		Dialect: dialect,
+		Dialect: d,
 	}, nil
 }
 
 // AddStruct XXX
 func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
-	pkgs := make(map[string]bool, 0)
+	pkgs := make(map[string]bool)
 
 	for _, s := range ss {
 		if s == nil {
@@ -65,10 +65,7 @@ func (dm *DDLMaker) AddStruct(ss ...interface{}) error {
 // Generate ddl file
 func (dm *DDLMaker) Generate() error {
 	log.Printf("start generate %s \n", dm.config.OutFilePath)
-	err := dm.parse()
-	if err != nil {
-		return errors.Wrap(err, "error parse")
-	}
+	dm.parse()
 
 	file, err := os.Create(dm.config.OutFilePath)
 	if err != nil {
@@ -102,14 +99,18 @@ func (dm *DDLMaker) generate(w io.Writer) error {
 		return errors.Wrap(err, "error parse template")
 	}
 
-	header.Execute(w, nil)
+	if err := header.Execute(w, nil); err != nil {
+		return errors.Wrap(err, "template execute error")
+	}
 	for _, table := range dm.Tables {
 		err := tmpl.Execute(w, table)
 		if err != nil {
 			return errors.Wrap(err, "template execute error")
 		}
 	}
-	footer.Execute(w, nil)
+	if err := footer.Execute(w, nil); err != nil {
+		return errors.Wrap(err, "template execute error")
+	}
 
 	return nil
 }
