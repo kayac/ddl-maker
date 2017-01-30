@@ -27,7 +27,7 @@ type Entry struct {
 	Id        int32   `ddl:"auto"`
 	Title     string  `ddl:"size=100"`
 	Public    bool    `ddl:"default=0"`
-	Content   *string `ddl:"text"`
+	Content   *string `ddl:"type=text"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -49,7 +49,7 @@ type PlayerComment struct {
 	PlayerID  int32          `json:"player_id"`
 	EntryID   int32          `json:"entry_id"`
 	Comment   sql.NullString `json:"comment" ddl:"null,size=99"`
-	CreatedAt time.Time      `ddl:"-" json:"created_at"`
+	CreatedAt time.Time      `json:"created_at"`
 	updatedAt time.Time
 }
 
