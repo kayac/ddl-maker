@@ -34,9 +34,9 @@ func (t2 *Test2) PrimaryKey() dialect.PrimaryKey {
 	return mysql.AddPrimaryKey("id", "created_at")
 }
 
-func TestNewMaker(t *testing.T) {
+func TestNew(t *testing.T) {
 	conf := Config{}
-	_, err := NewMaker(conf)
+	_, err := New(conf)
 	if err == nil {
 		t.Fatal("Not set driver name", err)
 	}
@@ -44,7 +44,7 @@ func TestNewMaker(t *testing.T) {
 	conf = Config{
 		DB: DBConfig{Driver: "dummy"},
 	}
-	_, err = NewMaker(conf)
+	_, err = New(conf)
 	if err == nil {
 		t.Fatal("Set unsupport driver name", err)
 	}
@@ -52,14 +52,14 @@ func TestNewMaker(t *testing.T) {
 	conf = Config{
 		DB: DBConfig{Driver: "mysql"},
 	}
-	_, err = NewMaker(conf)
+	_, err = New(conf)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func TestAddStruct(t *testing.T) {
-	dm, err := NewMaker(Config{
+	dm, err := New(Config{
 		DB: DBConfig{Driver: "mysql"},
 	})
 	if err != nil {
@@ -110,7 +110,7 @@ CREATE TABLE %s (
 
 %s`, m.HeaderTemplate(), m.Quote("test2"), m.Quote("test2"), m.Quote("id"), m.Quote("test1_id"), m.Quote("comment"), m.Quote("created_at"), m.Quote("updated_at"), m.Quote("id"), m.Quote("created_at"), m.FooterTemplate())
 
-	dm, err := NewMaker(Config{
+	dm, err := New(Config{
 		DB: DBConfig{
 			Driver:  "mysql",
 			Engine:  "InnoDB",
@@ -138,7 +138,7 @@ CREATE TABLE %s (
 		t.Fatalf("generatedDDL: %s \n checkDDLL: %s \n", ddl1.String(), generatedDDL)
 	}
 
-	dm2, err := NewMaker(Config{
+	dm2, err := New(Config{
 		DB: DBConfig{
 			Driver:  "mysql",
 			Engine:  "InnoDB",
@@ -150,10 +150,7 @@ CREATE TABLE %s (
 	if err != nil {
 		t.Fatal("error add pointer struct", err)
 	}
-	err = dm2.parse()
-	if err != nil {
-		t.Fatal("error parse file", err)
-	}
+	dm2.parse()
 
 	var ddl2 bytes.Buffer
 	err = dm2.generate(&ddl2)

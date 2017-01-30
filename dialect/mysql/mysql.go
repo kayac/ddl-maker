@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	mysqlDefaultVarcharSize = 191
-	mysqlAutoIncreament     = "AUTO_INCREMENT"
+	defaultVarcharSize = 191
+	autoIncrement     = "AUTO_INCREMENT"
 )
 
 // MySQL XXX
@@ -109,7 +109,7 @@ func (mysql MySQL) Quote(s string) string {
 
 // AutoIncrement XXX
 func (mysql MySQL) AutoIncrement() string {
-	return mysqlAutoIncreament
+	return autoIncrement
 }
 
 // Name XXX
@@ -193,7 +193,7 @@ func AddPrimaryKey(columns ...string) PrimaryKey {
 
 func varchar(size uint64) string {
 	if size == 0 {
-		return fmt.Sprintf("VARCHAR(%d)", mysqlDefaultVarcharSize)
+		return fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize)
 	}
 
 	return fmt.Sprintf("VARCHAR(%d)", size)

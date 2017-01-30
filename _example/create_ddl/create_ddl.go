@@ -43,7 +43,7 @@ func main() {
 		OutFilePath: outFilePath,
 	}
 
-	dm, err := ddlmaker.NewMaker(conf)
+	dm, err := ddlmaker.New(conf)
 	if err != nil {
 		log.Println(err.Error())
 		return

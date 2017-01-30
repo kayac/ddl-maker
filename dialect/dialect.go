@@ -12,7 +12,7 @@ type Dialect interface {
 	HeaderTemplate() string
 	FooterTemplate() string
 	TableTemplate() string
-	ToSQL(typeNmae string, size uint64) string
+	ToSQL(typeName string, size uint64) string
 	Quote(string) string
 	AutoIncrement() string
 }
@@ -67,8 +67,8 @@ func (indexes Indexes) Sort() Indexes {
 	return sortIndexes
 }
 
-// NewDialect return Dialect
-func NewDialect(driver, engine, charset string) (Dialect, error) {
+// New creates a Dialect and returns it.
+func New(driver, engine, charset string) (Dialect, error) {
 	var d Dialect
 
 	switch driver {
