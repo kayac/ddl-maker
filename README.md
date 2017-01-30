@@ -38,7 +38,7 @@ type Entry struct {
 	Id        int32   `ddl:"auto"`
 	Title     string  `ddl:"size=100"`
 	Public    bool    `ddl:"default=0"`
-	Content   *string `ddl:"text"`
+	Content   *string `ddl:"type=text"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -192,7 +192,7 @@ CREATE TABLE `entry` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(100) NOT NULL,
     `public` TINYINT(1) NOT NULL DEFAULT 0,
-    `content` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     INDEX `created_at_idx` (`created_at`),
