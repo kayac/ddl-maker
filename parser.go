@@ -76,6 +76,8 @@ func parseTable(s interface{}, columns []dialect.Column, d dialect.Dialect) dial
 	}
 	if v, ok := s.(PrimaryKey); ok {
 		primaryKey = v.PrimaryKey()
+	} else {
+		panic(`you must implement PrimaryKey interface: ` + tableName)
 	}
 	if v, ok := s.(Index); ok {
 		indexes = v.Indexes()
