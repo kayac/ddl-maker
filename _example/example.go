@@ -13,6 +13,7 @@ type User struct {
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Token     string `ddl:"-"`
 }
 
 func (u *User) Table() string {
