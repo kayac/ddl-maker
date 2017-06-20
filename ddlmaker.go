@@ -15,6 +15,13 @@ import (
 const (
 	// TAGPREFIX is struct tag field prefix
 	TAGPREFIX = "ddl"
+	// IGNORETAG using ignore struct field
+	IGNORETAG = "-"
+)
+
+var (
+	// ErrIgnoreField is Ignore Field Error
+	ErrIgnoreField = errors.New("error ignore this field")
 )
 
 // DDLMaker XXX

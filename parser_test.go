@@ -15,6 +15,7 @@ type T1 struct {
 	Name        string
 	Description sql.NullString `ddl:"null,text"`
 	CreatedAt   time.Time
+	Ignore      string `ddl:"-"`
 }
 
 func (t1 T1) Table() string {
@@ -64,7 +65,13 @@ func TestParseField(t *testing.T) {
 	}
 
 	for i := 0; i < rt.NumField(); i++ {
-		column := parseField(rt.Field(i), mysql.MySQL{})
+		column, err := parseField(rt.Field(i), mysql.MySQL{})
+		if err != nil {
+			if err == ErrIgnoreField {
+				continue
+			}
+			t.Fatal("error parse field", err.Error())
+		}
 
 		if !reflect.DeepEqual(columns[i], column) {
 			t.Fatalf("parsed %s: %v is different \n %s: %v", column.Name(), column, columns[i].Name(), columns[i])

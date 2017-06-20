@@ -2,6 +2,7 @@ package ddlmaker
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 	"strings"
 
@@ -32,7 +33,13 @@ func (dm *DDLMaker) parse() {
 		var columns []dialect.Column
 		for i := 0; i < rt.NumField(); i++ {
 			rtField := rt.Field(i)
-			column := parseField(rtField, dm.Dialect)
+			column, err := parseField(rtField, dm.Dialect)
+			if err != nil {
+				if err == ErrIgnoreField {
+					continue
+				}
+				log.Fatalln("error parse field", err.Error())
+			}
 			columns = append(columns, column)
 		}
 
@@ -41,8 +48,14 @@ func (dm *DDLMaker) parse() {
 	}
 }
 
-func parseField(field reflect.StructField, d dialect.Dialect) dialect.Column {
+func parseField(field reflect.StructField, d dialect.Dialect) (dialect.Column, error) {
 	tagStr := strings.Replace(field.Tag.Get(TAGPREFIX), " ", "", -1)
+
+	for _, tag := range strings.Split(tagStr, ",") {
+		if tag == IGNORETAG {
+			return nil, ErrIgnoreField
+		}
+	}
 
 	var typeName string
 	if field.Type.PkgPath() != "" {
@@ -60,7 +73,7 @@ func parseField(field reflect.StructField, d dialect.Dialect) dialect.Column {
 		typeName = field.Type.Name()
 	}
 
-	return newColumn(snaker.CamelToSnake(field.Name), typeName, tagStr, d)
+	return newColumn(snaker.CamelToSnake(field.Name), typeName, tagStr, d), nil
 }
 
 func parseTable(s interface{}, columns []dialect.Column, d dialect.Dialect) dialect.Table {
