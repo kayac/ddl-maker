@@ -52,7 +52,7 @@ func parseField(field reflect.StructField, d dialect.Dialect) (dialect.Column, e
 	tagStr := strings.Replace(field.Tag.Get(TAGPREFIX), " ", "", -1)
 
 	for _, tag := range strings.Split(tagStr, ",") {
-		if tag == IGNORETAGPREFIX {
+		if tag == IGNORETAG {
 			return nil, ErrIgnoreField
 		}
 	}

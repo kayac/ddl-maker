@@ -15,8 +15,8 @@ import (
 const (
 	// TAGPREFIX is struct tag field prefix
 	TAGPREFIX = "ddl"
-	// IGNORETAGPREFIX using ignore struct field
-	IGNORETAGPREFIX = "-"
+	// IGNORETAG using ignore struct field
+	IGNORETAG = "-"
 )
 
 var (
