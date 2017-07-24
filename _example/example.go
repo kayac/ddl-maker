@@ -9,11 +9,12 @@ import (
 )
 
 type User struct {
-	Id        uint64
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Token     string `ddl:"-"`
+	Id                  uint64
+	Name                string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
+	Token               string `ddl:"-"`
+	DailyNotificationAt string `ddl:"type=time"`
 }
 
 func (u *User) Table() string {

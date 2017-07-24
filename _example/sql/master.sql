@@ -7,6 +7,7 @@ CREATE TABLE `player` (
     `name` VARCHAR(191) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    `daily_notification_at` TIME NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
