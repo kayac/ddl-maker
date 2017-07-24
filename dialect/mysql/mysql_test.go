@@ -46,6 +46,10 @@ func TestToSQL(t *testing.T) {
 	if m.ToSQL("text", 0) != "TEXT" {
 		t.Fatalf("error %s to sql %s. but result %s", "text", "TEXT", m.ToSQL("text", 0))
 	}
+
+	if m.ToSQL("time", 0) != "TIME" {
+		t.Fatalf("error %s to sql %s. but result %s", "time", "TIME", m.ToSQL("type", 0))
+	}
 }
 
 func TestQuote(t *testing.T) {
