@@ -90,6 +90,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "TINYINT(1)"
 	case "text":
 		return "TEXT"
+	case "time":
+		return "TIME"
 	case "time.Time":
 		return "DATETIME"
 	default:
