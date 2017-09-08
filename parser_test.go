@@ -86,14 +86,14 @@ func TestParseTable(t *testing.T) {
 	var columns []dialect.Column
 	table := parseTable(t1, columns, d)
 	if table.Name() != d.Quote(t1.Table()) {
-		t.Fatal("error parse table name", table.Name)
+		t.Fatal("error parse table name", table.Name())
 	}
 
 	if len(table.Indexes()) != len(t1.Indexes()) {
-		t.Fatal("error parse index ", table.Indexes)
+		t.Fatal("error parse index ", len(table.Indexes()))
 	}
 
 	if table.PrimaryKey().ToSQL() != "PRIMARY KEY (`id`, `created_at`)" {
-		t.Fatal("error parse pk: ", table.PrimaryKey)
+		t.Fatal("error parse pk: ", table.PrimaryKey().ToSQL())
 	}
 }
