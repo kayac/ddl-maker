@@ -8,7 +8,7 @@ import (
 
 const (
 	defaultVarcharSize = 191
-	autoIncrement     = "AUTO_INCREMENT"
+	autoIncrement      = "AUTO_INCREMENT"
 )
 
 // MySQL XXX
@@ -93,6 +93,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 	case "time":
 		return "TIME"
 	case "time.Time":
+		return "DATETIME"
+	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
 		return "DATETIME"
 	default:
 		log.Fatalf("%s is not match.", typeName)
