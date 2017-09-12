@@ -56,7 +56,12 @@ func TestToSQL(t *testing.T) {
 	}
 
 	if m.ToSQL("time", 0) != "TIME" {
-		t.Fatalf("error %s to sql %s. but result %s", "time", "TIME", m.ToSQL("type", 0))
+		t.Fatalf("error %s to sql %s. but result %s", "time", "TIME", m.ToSQL("time", 0))
+	}
+
+	// https://godoc.org/github.com/go-sql-driver/mysql#NullTime
+	if m.ToSQL("mysql.NullTime", 0) != "DATETIME" {
+		t.Fatalf("error %s to sql %s. but result %s", "mysql.NullTime", "DATETIME", m.ToSQL("mysql.NullTime", 0))
 	}
 }
 
