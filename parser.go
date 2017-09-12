@@ -58,7 +58,8 @@ func parseField(field reflect.StructField, d dialect.Dialect) (dialect.Column, e
 	}
 
 	var typeName string
-	if field.Type.PkgPath() != "" {
+	switch {
+	case field.Type.PkgPath() != "":
 		// ex) time.Time
 		pkgName := field.Type.PkgPath()
 		if strings.Contains(pkgName, "/") {
@@ -66,10 +67,13 @@ func parseField(field reflect.StructField, d dialect.Dialect) (dialect.Column, e
 			pkgName = pkgs[len(pkgs)-1]
 		}
 		typeName = fmt.Sprintf("%s.%s", pkgName, field.Type.Name())
-	} else if field.Type.Kind().String() == "ptr" {
+	case field.Type.Kind() == reflect.Ptr:
 		// pointer type
 		typeName = fmt.Sprintf("*%s", field.Type.Elem())
-	} else {
+	case field.Type.Kind() == reflect.Slice:
+		// slice type
+		typeName = fmt.Sprintf("[]%s", field.Type.Elem())
+	default:
 		typeName = field.Type.Name()
 	}
 

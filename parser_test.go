@@ -15,6 +15,7 @@ type T1 struct {
 	Name        string
 	Description sql.NullString `ddl:"null,text"`
 	CreatedAt   time.Time
+	Binary      []byte
 	Ignore      string `ddl:"-"`
 }
 
@@ -56,7 +57,12 @@ func TestParseField(t *testing.T) {
 		typeName: "time.Time",
 		dialect:  mysql.MySQL{},
 	}
-	columns := []dialect.Column{idColumn, nameColumn, descColumn, createdAtColumn}
+	binaryColumn := column{
+		name:     "binary",
+		typeName: "[]uint8",
+		dialect:  mysql.MySQL{},
+	}
+	columns := []dialect.Column{idColumn, nameColumn, descColumn, createdAtColumn, binaryColumn}
 
 	rt := reflect.TypeOf(t1)
 
