@@ -91,8 +91,14 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return varbinary(size)
 	case "bool":
 		return "TINYINT(1)"
+	case "tinytext":
+		return "TINYTEXT"
 	case "text":
 		return "TEXT"
+	case "mediumtext":
+		return "MEDIUMTEXT"
+	case "longtext":
+		return "LONGTEXT"
 	case "tinyblob":
 		return "TINYBLOB"
 	case "blob":
