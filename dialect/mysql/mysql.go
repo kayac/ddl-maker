@@ -65,23 +65,23 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 	var columns []string
 
 	switch typeName {
-	case "int8":
+	case "int8", "*int8":
 		return "TINYINT"
-	case "int16":
+	case "int16", "*int16":
 		return "SMALLINT"
-	case "int32":
+	case "int32", "*int32":
 		return "INTEGER"
 	case "int64", "*int64", "sql.NullInt64":
 		return "BIGINT"
-	case "uint8":
+	case "uint8", "*uint8":
 		return "TINYINT unsigned"
-	case "uint16":
+	case "uint16", "*uint16":
 		return "SMALLINT unsigned"
-	case "uint32":
+	case "uint32", "*uint32":
 		return "INTEGER unsigned"
-	case "uint64":
+	case "uint64", "*uint64":
 		return "BIGINT unsigned"
-	case "float32":
+	case "float32", "*float32":
 		return "FLOAT"
 	case "float64", "*float64", "sql.NullFloat64":
 		return "DOUBLE"
@@ -109,7 +109,7 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "LONGBLOB"
 	case "time":
 		return "TIME"
-	case "time.Time":
+	case "time.Time", "*time.Time":
 		return "DATETIME"
 	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
 		return "DATETIME"
