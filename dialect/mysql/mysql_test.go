@@ -7,61 +7,62 @@ import (
 
 func TestToSQL(t *testing.T) {
 	m := MySQL{}
-	args := make(map[string]string, 0)
-	args["bool"] = "TINYINT(1)"
-	args["int8"] = "TINYINT"
-	args["int16"] = "SMALLINT"
-	args["int32"] = "INTEGER"
-	args["int64"] = "BIGINT"
-	args["uint8"] = "TINYINT unsigned"
-	args["uint16"] = "SMALLINT unsigned"
-	args["uint32"] = "INTEGER unsigned"
-	args["uint64"] = "BIGINT unsigned"
-	args["float32"] = "FLOAT"
-	args["float64"] = "DOUBLE"
 
-	for k, v := range args {
-		if m.ToSQL(k, 0) != v {
-			t.Fatalf("error %s to sql %s. but result %s", k, v, m.ToSQL(k, 0))
+	testcases := []struct {
+		typeName string
+		size     uint64
+		output   string
+	}{
+		{"bool", 0, "TINYINT(1)"},
+		{"*bool", 0, "TINYINT(1)"},
+		{"sql.NullBool", 0, "TINYINT(1)"},
+		{"int8", 0, "TINYINT"},
+		{"*int8", 0, "TINYINT"},
+		{"int16", 0, "SMALLINT"},
+		{"*int16", 0, "SMALLINT"},
+		{"int32", 0, "INTEGER"},
+		{"*int32", 0, "INTEGER"},
+		{"int64", 0, "BIGINT"},
+		{"*int64", 0, "BIGINT"},
+		{"sql.NullInt64", 0, "BIGINT"},
+		{"uint8", 0, "TINYINT unsigned"},
+		{"*uint8", 0, "TINYINT unsigned"},
+		{"uint16", 0, "SMALLINT unsigned"},
+		{"*uint16", 0, "SMALLINT unsigned"},
+		{"uint32", 0, "INTEGER unsigned"},
+		{"*uint32", 0, "INTEGER unsigned"},
+		{"uint64", 0, "BIGINT unsigned"},
+		{"*uint64", 0, "BIGINT unsigned"},
+		{"float32", 0, "FLOAT"},
+		{"*float32", 0, "FLOAT"},
+		{"float64", 0, "DOUBLE"},
+		{"*float64", 0, "DOUBLE"},
+		{"sql.NullFloat64", 0, "DOUBLE"},
+		{"string", 0, fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize)},
+		{"*string", 0, fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize)},
+		{"sql.NullString", 0, fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize)},
+		{"string", 10, "VARCHAR(10)"},
+		{"*string", 10, "VARCHAR(10)"},
+		{"sql.NullString", 10, "VARCHAR(10)"},
+		{"[]uint8", 10, "VARBINARY(10)"},
+		{"sql.RawBytes", 10, "VARBINARY(10)"},
+		{"tinytext", 0, "TINYTEXT"},
+		{"text", 0, "TEXT"},
+		{"mediumtext", 0, "MEDIUMTEXT"},
+		{"longtext", 0, "LONGTEXT"},
+		{"tinyblob", 0, "TINYBLOB"},
+		{"blob", 0, "BLOB"},
+		{"mediumblob", 0, "MEDIUMBLOB"},
+		{"longblob", 0, "LONGBLOB"},
+		{"time", 0, "TIME"},
+		{"time.Time", 0, "DATETIME"},
+		{"mysql.NullTime", 0, "DATETIME"}, // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
+	}
+
+	for _, tc := range testcases {
+		if m.ToSQL(tc.typeName, tc.size) != tc.output {
+			t.Fatalf("error %s to sql %s. but result %s", tc.typeName, tc.output, m.ToSQL(tc.typeName, tc.size))
 		}
-	}
-
-	if m.ToSQL("string", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "string", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("string", 0))
-	}
-
-	if m.ToSQL("*string", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "*string", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("*string", 0))
-	}
-
-	if m.ToSQL("sql.NullString", 0) != fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize) {
-		t.Fatalf("error %s to sql %s. but result %s", "sql.NullString", fmt.Sprintf("VARCHAR(%d)", defaultVarcharSize), m.ToSQL("sql.NullString", 0))
-	}
-
-	size := uint64(10)
-	if m.ToSQL("sql.NullString", size) != fmt.Sprintf("VARCHAR(%d)", size) {
-		t.Fatalf("error %s to sql %s. but result %s", "sql.NullString", fmt.Sprintf("VARCHAR(%d)", size), m.ToSQL("sql.NullString", size))
-	}
-
-	if m.ToSQL("[]uint8", size) != fmt.Sprintf("VARBINARY(%d)", size) {
-		t.Fatalf("error %s to sql %s. but result %s", "[]uint8", fmt.Sprintf("VARBINARY(%d)", size), m.ToSQL("[]uint8", size))
-	}
-
-	if m.ToSQL("sql.RawBytes", size) != fmt.Sprintf("VARBINARY(%d)", size) {
-		t.Fatalf("error %s to sql %s. but result %s", "sql.RawBytes", fmt.Sprintf("VARBINARY(%d)", size), m.ToSQL("sql.RawBytes", size))
-	}
-
-	if m.ToSQL("text", 0) != "TEXT" {
-		t.Fatalf("error %s to sql %s. but result %s", "text", "TEXT", m.ToSQL("text", 0))
-	}
-
-	if m.ToSQL("time", 0) != "TIME" {
-		t.Fatalf("error %s to sql %s. but result %s", "time", "TIME", m.ToSQL("time", 0))
-	}
-
-	// https://godoc.org/github.com/go-sql-driver/mysql#NullTime
-	if m.ToSQL("mysql.NullTime", 0) != "DATETIME" {
-		t.Fatalf("error %s to sql %s. but result %s", "mysql.NullTime", "DATETIME", m.ToSQL("mysql.NullTime", 0))
 	}
 }
 
