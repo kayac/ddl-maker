@@ -24,6 +24,8 @@ type User struct {
 	Name      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	Token               string `ddl:"-"`
+	DailyNotificationAt string `ddl:"type=time"`
 }
 
 func (u User) Table() string {
@@ -182,6 +184,7 @@ CREATE TABLE `player` (
     `name` VARCHAR(191) NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    `daily_notification_at` TIME NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -268,6 +271,7 @@ tag prefix is `ddl`
 | size=`<size>` |         VARCHAR(`<size value>`)          |
 |     auto      |              AUTO INCREMENT              |
 | type=`<type>` | OVERRIDE struct type. <br> ex) string \`ddl:"text` |
+|      -        |            Don't define column           |
 
 ## How to Set PrimaryKey
 
