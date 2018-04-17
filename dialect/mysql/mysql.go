@@ -113,6 +113,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "DATETIME"
 	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
 		return "DATETIME"
+	case "json.RawMessage", "*json.RawMessage":
+		return "JSON"
 	default:
 		log.Fatalf("%s is not match.", typeName)
 	}
