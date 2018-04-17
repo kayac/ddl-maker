@@ -258,6 +258,7 @@ ___
 |  string, sql.NullString   |      VARCHAR      |
 |    bool, sql.NullBool     |    TINYINT(1)     |
 | time.Time, mysql.NullTime |     DATETIME      |
+|      json.RawMessage      |        JSON       |
 
 [mysql.NullTime](https://godoc.org/github.com/go-sql-driver/mysql#NullTime) is from [github.com/go-sql-driver/mysql](https://github.com/go-sql-driver/mysql).
 
