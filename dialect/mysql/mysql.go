@@ -111,7 +111,11 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "TIME"
 	case "time.Time", "*time.Time":
 		return "DATETIME"
-	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
+	case "mysql.NullTime", "sql.NullTime":
+		// sql.NullTime is supported from Go 1.13
+		// mysql.NullTime is an alias of sql.NullTime now.
+		// https://godoc.org/github.com/go-sql-driver/mysql#NullTime
+		// https://github.com/go-sql-driver/mysql/blob/b2c03bcae3d4bf9658e63ad4b9b32581d810fb20/nulltime_go113.go#L31
 		return "DATETIME"
 	case "json.RawMessage", "*json.RawMessage":
 		return "JSON"
