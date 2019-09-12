@@ -1,12 +1,15 @@
 language: go
-go:
-  - 1.8
-  - 1.9
-  - tip
 
-install:
-  - go get -v github.com/Masterminds/glide
-  - cd $GOPATH/src/github.com/Masterminds/glide && git checkout tags/v0.12.3 && go install && cd -
+env:
+  GO111MODULE: "on"
+
+go:
+  - "1.8"
+  - "1.9"
+  - "1.10"
+  - "1.12"
+  - "1.13"
+  - tip
 
 script:
   - make test

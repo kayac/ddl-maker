@@ -1,26 +1,21 @@
-TEST_FILE = $(shell glide novendor)
-VET_FILE = $(shell find . -type f -name '*.go' -not -path "./vendor/*")
-
+.PHONEY: test
 test: deps lint
 
-	go test -v ${TEST_FILE}
+	go test -v ./...
 
+.PHONEY: lint
 lint: deps
 
 	go vet ./...
-	glide novendor | xargs -n 1 golint -set_exit_status
+	golint -set_exit_status
 
+.PHONEY: deps
 deps:
 
-	go get github.com/golang/lint/golint
-	glide install
+	GO111MODULE=off go get github.com/golang/lint/golint
+	go get ./...
 
-deps-update: clean
-
-	glide update
-
+.PHONEY: clean
 clean:
 
 	go clean
-	glide cache-clear
-	rm -rf ./vendor
