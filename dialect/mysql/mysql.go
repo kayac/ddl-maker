@@ -43,7 +43,8 @@ func (mysql MySQL) HeaderTemplate() string {
 
 // FooterTemplate XXX
 func (mysql MySQL) FooterTemplate() string {
-	return `SET foreign_key_checks=1;`
+	return `SET foreign_key_checks=1;
+`
 }
 
 // TableTemplate XXX
