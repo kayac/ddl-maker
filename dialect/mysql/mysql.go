@@ -30,6 +30,13 @@ type UniqueIndex struct {
 	name    string
 }
 
+// FullTextIndex XXX
+type FullTextIndex struct {
+	columns []string
+	name    string
+	parser  string
+}
+
 // PrimaryKey XXX
 type PrimaryKey struct {
 	columns []string
@@ -176,6 +183,26 @@ func (ui UniqueIndex) ToSQL() string {
 	return fmt.Sprintf("UNIQUE %s (%s)", quote(ui.name), strings.Join(columnsStr, ", "))
 }
 
+// Name XXX
+func (fi FullTextIndex) Name() string {
+	return fi.name
+}
+
+// Columns XXX
+func (fi FullTextIndex) Columns() []string {
+	return fi.columns
+}
+
+// ToSQL return full text index sql string
+func (fi FullTextIndex) ToSQL() string {
+	var columnsStr []string
+	for _, c := range fi.columns {
+		columnsStr = append(columnsStr, quote(c))
+	}
+
+	return fmt.Sprintf("FULLTEXT %s (%s)", quote(fi.name), strings.Join(columnsStr, ", "))
+}
+
 // Columns XXX
 func (pk PrimaryKey) Columns() []string {
 	return pk.columns
@@ -202,6 +229,14 @@ func AddIndex(idxName string, columns ...string) Index {
 // AddUniqueIndex XXX
 func AddUniqueIndex(idxName string, columns ...string) UniqueIndex {
 	return UniqueIndex{
+		name:    idxName,
+		columns: columns,
+	}
+}
+
+// AddFullTextIndex XXX
+func AddFullTextIndex(idxName string, columns ...string) FullTextIndex {
+	return FullTextIndex{
 		name:    idxName,
 		columns: columns,
 	}

@@ -105,6 +105,13 @@ func TestAddUniqIndex(t *testing.T) {
 		t.Fatal("[error] parse unique player_entry_id_idx", uniqIndex.ToSQL())
 	}
 }
+
+func TestAddFullTextIndex(t *testing.T) {
+	fullTextIndex := AddFullTextIndex("full_text_idx", "content")
+	if fullTextIndex.ToSQL() != "FULLTEXT `full_text_idx` (`content`)" {
+		t.Fatal("[error] parse full_text_idx", fullTextIndex.ToSQL())
+	}
+}
 func TestAddPrimaryKey(t *testing.T) {
 	pk := AddPrimaryKey("id")
 	if pk.ToSQL() != "PRIMARY KEY (`id`)" {
