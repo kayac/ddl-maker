@@ -193,6 +193,12 @@ func (fi FullTextIndex) Columns() []string {
 	return fi.columns
 }
 
+// WithParser XXX
+func (fi FullTextIndex) WithParser(s string) FullTextIndex {
+	fi.parser = s
+	return fi
+}
+
 // ToSQL return full text index sql string
 func (fi FullTextIndex) ToSQL() string {
 	var columnsStr []string
@@ -200,7 +206,11 @@ func (fi FullTextIndex) ToSQL() string {
 		columnsStr = append(columnsStr, quote(c))
 	}
 
-	return fmt.Sprintf("FULLTEXT %s (%s)", quote(fi.name), strings.Join(columnsStr, ", "))
+	sql := fmt.Sprintf("FULLTEXT %s (%s)", quote(fi.name), strings.Join(columnsStr, ""))
+	if fi.parser != "" {
+		sql += fmt.Sprintf(" WITH PARSER %s", fi.parser)
+	}
+	return sql
 }
 
 // Columns XXX

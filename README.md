@@ -291,11 +291,11 @@ func (b Bookmark) PrimaryKey() dialect.PrimaryKey {
 
 Define struct method called `Indexes()`
 
-|   Index Type    |                      Method                       |
-| :-------------: | :-----------------------------------------------: |
-|      Index      |     dialect.Index(`index name`, `columns`...)     |
-|  Unique Index   |   dialect.UniqIndex(`index name`, `columns`...)   |
-| Full Text Index | dialect.FullTextIndex(`index name`, `columns`...) |
+|   Index Type    |                                Method                                 |
+| :-------------: | :-------------------------------------------------------------------: |
+|      Index      |               dialect.Index(`index name`, `columns`...)               |
+|  Unique Index   |             dialect.UniqIndex(`index name`, `columns`...)             |
+| Full Text Index | dialect.FullTextIndex(`index name`, `columns`...).WithParser("ngram") |
 
 ex)
 
