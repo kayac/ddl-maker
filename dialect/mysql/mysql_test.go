@@ -112,6 +112,11 @@ func TestAddFullTextIndex(t *testing.T) {
 		t.Fatal("[error] parse full_text_idx", fullTextIndex.ToSQL())
 	}
 
+	fullTextIndex = AddFullTextIndex("full_text_idx", "content", "title")
+	if fullTextIndex.ToSQL() != "FULLTEXT `full_text_idx` (`content`, `title`)" {
+		t.Fatal("[error] parse full_text_idx", fullTextIndex.ToSQL())
+	}
+
 	fullTextIndex = AddFullTextIndex("full_text_idx", "content").WithParser("ngram")
 	if fullTextIndex.ToSQL() != "FULLTEXT `full_text_idx` (`content`) WITH PARSER ngram" {
 		t.Fatal("[error] parse full_text_idx", fullTextIndex.ToSQL())
