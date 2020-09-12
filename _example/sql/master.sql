@@ -21,6 +21,7 @@ CREATE TABLE `entry` (
     `content` TEXT NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    FULLTEXT `full_text_idx` (`content`) WITH PARSER ngram,
     INDEX `created_at_idx` (`created_at`),
     INDEX `title_idx` (`title`),
     UNIQUE `created_at_uniq_idx` (`created_at`),
