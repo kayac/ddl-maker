@@ -69,7 +69,7 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "TINYINT"
 	case "int16", "*int16":
 		return "SMALLINT"
-	case "int32", "*int32":
+	case "int32", "*int32", "sql.NullInt32": // from Go 1.13
 		return "INTEGER"
 	case "int64", "*int64", "sql.NullInt64":
 		return "BIGINT"
@@ -112,6 +112,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 	case "time.Time", "*time.Time":
 		return "DATETIME"
 	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
+		return "DATETIME"
+	case "sql.NullTime": // from Go 1.13
 		return "DATETIME"
 	case "json.RawMessage", "*json.RawMessage":
 		return "JSON"
