@@ -43,6 +43,7 @@ func (e Entry) Indexes() dialect.Indexes {
 		mysql.AddUniqueIndex("created_at_uniq_idx", "created_at"),
 		mysql.AddIndex("title_idx", "title"),
 		mysql.AddIndex("created_at_idx", "created_at"),
+		mysql.AddFullTextIndex("full_text_idx", "content").WithParser("ngram"),
 	}
 }
 
