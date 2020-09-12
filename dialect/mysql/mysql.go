@@ -123,6 +123,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "DATETIME"
 	case "sql.NullTime": // from Go 1.13
 		return "DATETIME"
+	case "date":
+		return "DATE"
 	case "json.RawMessage", "*json.RawMessage":
 		return "JSON"
 	default:
