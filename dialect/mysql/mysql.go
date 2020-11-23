@@ -213,7 +213,7 @@ func (fi FullTextIndex) ToSQL() string {
 
 	sql := fmt.Sprintf("FULLTEXT %s (%s)", quote(fi.name), strings.Join(columnsStr, ", "))
 	if fi.parser != "" {
-		sql += fmt.Sprintf(" WITH PARSER %s", fi.parser)
+		sql += fmt.Sprintf(" WITH PARSER %s", quote(fi.parser))
 	}
 	return sql
 }
