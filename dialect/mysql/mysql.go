@@ -127,6 +127,8 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 		return "DATE"
 	case "json.RawMessage", "*json.RawMessage":
 		return "JSON"
+	case "geometry":
+		return "GEOMETRY"
 	default:
 		log.Fatalf("%s is not match.", typeName)
 	}

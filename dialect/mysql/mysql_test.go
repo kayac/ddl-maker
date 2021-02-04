@@ -60,6 +60,7 @@ func TestToSQL(t *testing.T) {
 		{"mysql.NullTime", 0, "DATETIME"}, // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
 		{"sql.NullTime", 0, "DATETIME"},   // from Go 1.13
 		{"date", 0, "DATE"},
+		{"geometry", 0, "GEOMETRY"},
 		{"json.RawMessage", 0, "JSON"},
 	}
 
