@@ -37,6 +37,12 @@ type FullTextIndex struct {
 	parser  string
 }
 
+// SpatialIndex XXX
+type SpatialIndex struct {
+	columns []string
+	name    string
+}
+
 // PrimaryKey XXX
 type PrimaryKey struct {
 	columns []string
@@ -220,6 +226,26 @@ func (fi FullTextIndex) ToSQL() string {
 	return sql
 }
 
+// Name XXX
+func (si SpatialIndex) Name() string {
+	return si.name
+}
+
+// Columns XXX
+func (si SpatialIndex) Columns() []string {
+	return si.columns
+}
+
+// ToSQL return unique index sql string
+func (si SpatialIndex) ToSQL() string {
+	var columnsStr []string
+	for _, c := range si.columns {
+		columnsStr = append(columnsStr, quote(c))
+	}
+
+	return fmt.Sprintf("SPATIAL %s (%s)", quote(si.name), strings.Join(columnsStr, ", "))
+}
+
 // Columns XXX
 func (pk PrimaryKey) Columns() []string {
 	return pk.columns
@@ -254,6 +280,14 @@ func AddUniqueIndex(idxName string, columns ...string) UniqueIndex {
 // AddFullTextIndex XXX
 func AddFullTextIndex(idxName string, columns ...string) FullTextIndex {
 	return FullTextIndex{
+		name:    idxName,
+		columns: columns,
+	}
+}
+
+// AddSpatialIndex XXX
+func AddSpatialIndex(idxName string, columns ...string) SpatialIndex {
+	return SpatialIndex{
 		name:    idxName,
 		columns: columns,
 	}
