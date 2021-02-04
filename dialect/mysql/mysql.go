@@ -118,11 +118,11 @@ func (mysql MySQL) ToSQL(typeName string, size uint64) string {
 	case "time":
 		return "TIME"
 	case "time.Time", "*time.Time":
-		return "DATETIME"
+		return datetime(size)
 	case "mysql.NullTime": // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
-		return "DATETIME"
+		return datetime(size)
 	case "sql.NullTime": // from Go 1.13
-		return "DATETIME"
+		return datetime(size)
 	case "date":
 		return "DATE"
 	case "json.RawMessage", "*json.RawMessage":
@@ -278,6 +278,14 @@ func varbinary(size uint64) string {
 	}
 
 	return fmt.Sprintf("VARBINARY(%d)", size)
+}
+
+func datetime(size uint64) string {
+	if size == 0 {
+		return "DATETIME"
+	}
+
+	return fmt.Sprintf("DATETIME(%d)", size)
 }
 
 func quote(s string) string {
