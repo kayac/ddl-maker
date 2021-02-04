@@ -129,12 +129,12 @@ func TestAddFullTextIndex(t *testing.T) {
 
 func TestAddAddSpatialIndex(t *testing.T) {
 	spatialIndex := AddSpatialIndex("geometry_idx", "g")
-	if spatialIndex.ToSQL() != "SPATIAL `geometry_idx` (`g`)" {
+	if spatialIndex.ToSQL() != "SPATIAL KEY `geometry_idx` (`g`)" {
 		t.Fatal("[error] parse geometry_idx", spatialIndex.ToSQL())
 	}
 
 	spatialIndex = AddSpatialIndex("geometry_idx", "g", "g1")
-	if spatialIndex.ToSQL() != "SPATIAL `geometry_idx` (`g`, `g1`)" {
+	if spatialIndex.ToSQL() != "SPATIAL KEY `geometry_idx` (`g`, `g1`)" {
 		t.Fatal("[error] parse geometry_idx", spatialIndex.ToSQL())
 	}
 }

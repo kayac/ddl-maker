@@ -243,7 +243,7 @@ func (si SpatialIndex) ToSQL() string {
 		columnsStr = append(columnsStr, quote(c))
 	}
 
-	return fmt.Sprintf("SPATIAL %s (%s)", quote(si.name), strings.Join(columnsStr, ", "))
+	return fmt.Sprintf("SPATIAL KEY %s (%s)", quote(si.name), strings.Join(columnsStr, ", "))
 }
 
 // Columns XXX
