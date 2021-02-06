@@ -61,6 +61,7 @@ func TestToSQL(t *testing.T) {
 		{"mysql.NullTime", 0, "DATETIME"}, // https://godoc.org/github.com/go-sql-driver/mysql#NullTime
 		{"sql.NullTime", 0, "DATETIME"},   // from Go 1.13
 		{"date", 0, "DATE"},
+		{"geometry", 0, "GEOMETRY"},
 		{"json.RawMessage", 0, "JSON"},
 	}
 
@@ -126,6 +127,19 @@ func TestAddFullTextIndex(t *testing.T) {
 		t.Fatal("[error] parse full_text_idx", fullTextIndex.ToSQL())
 	}
 }
+
+func TestAddAddSpatialIndex(t *testing.T) {
+	spatialIndex := AddSpatialIndex("geometry_idx", "g")
+	if spatialIndex.ToSQL() != "SPATIAL KEY `geometry_idx` (`g`)" {
+		t.Fatal("[error] parse geometry_idx", spatialIndex.ToSQL())
+	}
+
+	spatialIndex = AddSpatialIndex("geometry_idx", "g", "g1")
+	if spatialIndex.ToSQL() != "SPATIAL KEY `geometry_idx` (`g`, `g1`)" {
+		t.Fatal("[error] parse geometry_idx", spatialIndex.ToSQL())
+	}
+}
+
 func TestAddPrimaryKey(t *testing.T) {
 	pk := AddPrimaryKey("id")
 	if pk.ToSQL() != "PRIMARY KEY (`id`)" {

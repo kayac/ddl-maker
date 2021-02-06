@@ -297,7 +297,7 @@ Define struct method called `Indexes()`
 |      Index      |                  dialect.Index(`index name`, `columns`...)                  |
 |  Unique Index   |                dialect.UniqIndex(`index name`, `columns`...)                |
 | Full Text Index | dialect.FullTextIndex(`index name`, `columns`...).WithParser(`parser name`) |
-
+|  Spatial Index  |              dialect.SpatialIndex(`index name`, `columns`...)               |
 ex)
 
 ```go
