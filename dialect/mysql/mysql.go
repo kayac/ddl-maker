@@ -48,6 +48,70 @@ type PrimaryKey struct {
 	columns []string
 }
 
+// ForeignKeyOptionType XXX
+type ForeignKeyOptionType string
+
+// ForeignKeyOptionCascade CASCADE
+var ForeignKeyOptionCascade ForeignKeyOptionType = "CASCADE"
+
+// ForeignKeyOptionSetNull SET NULL
+var ForeignKeyOptionSetNull ForeignKeyOptionType = "SET NULL"
+
+// ForeignKeyOptionRestrict RESTRICT
+var ForeignKeyOptionRestrict ForeignKeyOptionType = "RESTRICT"
+
+// ForeignKeyOptionNoAction NO ACTION
+var ForeignKeyOptionNoAction ForeignKeyOptionType = "NO ACTION"
+
+// ForeignKeyOptionSetDefault SET DEFAULT
+var ForeignKeyOptionSetDefault ForeignKeyOptionType = "SET DEFAULT"
+
+// ForeignKey XXX
+type ForeignKey struct {
+	foreignColumns     []string
+	referenceTableName string
+	referenceColumns   []string
+	updateOption       string
+	deleteOption       string
+}
+
+// ForeingKeyOption XXX
+type ForeingKeyOption interface {
+	Apply(*ForeignKey)
+}
+
+type withUpdateForeignKeyOption string
+
+func (o withUpdateForeignKeyOption) Apply(f *ForeignKey) {
+	f.updateOption = string(o)
+}
+
+// WithUpdateForeignKeyOption XXX
+func WithUpdateForeignKeyOption(option ForeignKeyOptionType) ForeingKeyOption {
+	switch option {
+	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
+	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
+		return withUpdateForeignKeyOption("")
+	}
+	return withUpdateForeignKeyOption(option)
+}
+
+type withDeleteForeignKeyOption string
+
+func (o withDeleteForeignKeyOption) Apply(f *ForeignKey) {
+	f.deleteOption = string(o)
+}
+
+// WithDeleteForeignKeyOption XXX
+func WithDeleteForeignKeyOption(option ForeignKeyOptionType) ForeingKeyOption {
+	switch option {
+	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
+	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
+		return withDeleteForeignKeyOption("")
+	}
+	return withDeleteForeignKeyOption(option)
+}
+
 // HeaderTemplate XXX
 func (mysql MySQL) HeaderTemplate() string {
 	return `SET foreign_key_checks=0;
