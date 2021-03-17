@@ -68,7 +68,8 @@ DROP TABLE IF EXISTS {{ .Name }};
 CREATE TABLE {{ .Name }} (
     {{ range .Columns }}{{ .ToSQL }},
     {{ end }}{{ range .Indexes.Sort  }}{{ .ToSQL }},
-    {{end}}{{ .PrimaryKey.ToSQL }}
+    {{end}}{{ .PrimaryKey.ToSQL }}{{ if .ForeignKey }},
+    {{ .ForeignKey.ToSQL }}{{end}}
 ) ENGINE={{ .Dialect.Engine }} DEFAULT CHARACTER SET {{ .Dialect.Charset }};
 
 `
