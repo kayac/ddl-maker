@@ -326,6 +326,54 @@ func (pk PrimaryKey) ToSQL() string {
 	return fmt.Sprintf("PRIMARY KEY (%s)", strings.Join(columnsStr, ", "))
 }
 
+// ForeignColumns XXX
+func (fk ForeignKey) ForeignColumns() []string {
+	return fk.foreignColumns
+}
+
+// ReferenceTableName XXX
+func (fk ForeignKey) ReferenceTableName() string {
+	return fk.referenceTableName
+}
+
+// ReferenceColumns XXX
+func (fk ForeignKey) ReferenceColumns() []string {
+	return fk.referenceColumns
+}
+
+// UpdateOption XXX
+func (fk ForeignKey) UpdateOption() string {
+	return fk.updateOption
+}
+
+// DeleteOption XXX
+func (fk ForeignKey) DeleteOption() string {
+	return fk.deleteOption
+}
+
+// ToSQL return foreign key sql string
+func (fk ForeignKey) ToSQL() string {
+	var foreignColumnsStr, referenceColumnsStr []string
+	for _, fc := range fk.foreignColumns {
+		foreignColumnsStr = append(foreignColumnsStr, quote(fc))
+	}
+	for _, rc := range fk.referenceColumns {
+		referenceColumnsStr = append(referenceColumnsStr, quote(rc))
+	}
+	sql := fmt.Sprintf("FOREIGN KEY (%s) REFERENCES %s (%s)",
+		strings.Join(foreignColumnsStr, ", "),
+		quote(fk.referenceTableName),
+		strings.Join(referenceColumnsStr, ", "))
+	if fk.deleteOption != "" {
+		sql = sql + fmt.Sprintf(" ON DELETE %s", fk.deleteOption)
+	}
+	if fk.updateOption != "" {
+		sql = sql + fmt.Sprintf(" ON UPDATE %s", fk.updateOption)
+	}
+	return sql
+
+}
+
 // AddIndex XXX
 func AddIndex(idxName string, columns ...string) Index {
 	return Index{
@@ -363,6 +411,23 @@ func AddPrimaryKey(columns ...string) PrimaryKey {
 	return PrimaryKey{
 		columns: columns,
 	}
+}
+
+// AddForeignKey XXX
+func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName string, option ...ForeingKeyOption) ForeignKey {
+	foreingKey := ForeignKey{
+		foreignColumns:     foreignColumns,
+		referenceTableName: referenceTableName,
+		referenceColumns:   referenceColumns,
+	}
+
+	for _, o := range option {
+		if o != nil {
+			o.Apply(&foreingKey)
+		}
+	}
+
+	return foreingKey
 }
 
 func varchar(size uint64) string {
