@@ -33,6 +33,10 @@ func (t1 T1) PrimaryKey() dialect.PrimaryKey {
 	return mysql.AddPrimaryKey("id", "created_at")
 }
 
+func (t1 T1) ForeignKey() dialect.ForeignKey {
+	return mysql.AddForeignKey([]string{"player_id"}, []string{"id"}, "player", mysql.WithUpdateForeignKeyOption(mysql.ForeignKeyOptionNoAction), mysql.WithDeleteForeignKeyOption(mysql.ForeignKeyOptionNoAction))
+}
+
 func TestParseField(t *testing.T) {
 	t1 := T1{}
 	idColumn := column{
@@ -101,5 +105,9 @@ func TestParseTable(t *testing.T) {
 
 	if table.PrimaryKey().ToSQL() != "PRIMARY KEY (`id`, `created_at`)" {
 		t.Fatal("error parse pk: ", table.PrimaryKey().ToSQL())
+	}
+
+	if table.ForeignKey().ToSQL() != "FOREIGN KEY (`player_id`) REFERENCES `player` (`id`)" {
+		t.Fatal("error parse fk: ", table.ForeignKey().ToSQL())
 	}
 }
