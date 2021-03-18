@@ -22,7 +22,7 @@ type PrimaryKey interface {
 
 // ForeignKey is for type assertion
 type ForeignKey interface {
-	ForeignKey() dialect.ForeignKey
+	ForeignKeys() dialect.ForeignKeys
 }
 
 // Index is for type assertion
@@ -88,7 +88,7 @@ func parseField(field reflect.StructField, d dialect.Dialect) (dialect.Column, e
 func parseTable(s interface{}, columns []dialect.Column, d dialect.Dialect) dialect.Table {
 	var tableName string
 	var primaryKey dialect.PrimaryKey
-	var foreignKey dialect.ForeignKey
+	var foreignKeys dialect.ForeignKeys
 	var indexes dialect.Indexes
 
 	if v, ok := s.(Table); ok {
@@ -101,11 +101,11 @@ func parseTable(s interface{}, columns []dialect.Column, d dialect.Dialect) dial
 		primaryKey = v.PrimaryKey()
 	}
 	if v, ok := s.(ForeignKey); ok {
-		foreignKey = v.ForeignKey()
+		foreignKeys = v.ForeignKeys()
 	}
 	if v, ok := s.(Index); ok {
 		indexes = v.Indexes()
 	}
 
-	return newTable(tableName, primaryKey, foreignKey, columns, indexes, d)
+	return newTable(tableName, primaryKey, foreignKeys, columns, indexes, d)
 }

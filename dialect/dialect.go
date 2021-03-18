@@ -21,7 +21,7 @@ type Dialect interface {
 type Table interface {
 	Name() string
 	PrimaryKey() PrimaryKey
-	ForeignKey() ForeignKey
+	ForeignKeys() ForeignKeys
 	Indexes() Indexes
 	Columns() []Column
 	Dialect() Dialect
@@ -39,6 +39,9 @@ type PrimaryKey interface {
 	ToSQL() string
 }
 
+// ForeignKeys XXX
+type ForeignKeys []ForeignKey
+
 // ForeignKey XXX
 type ForeignKey interface {
 	ForeignColumns() []string
@@ -47,6 +50,25 @@ type ForeignKey interface {
 	UpdateOption() string
 	DeleteOption() string
 	ToSQL() string
+}
+
+// Sort is sort foreignKeys value by alphabets
+func (foreignKeys ForeignKeys) Sort() ForeignKeys {
+	fkMap := make(map[string]ForeignKey, 0)
+	var fkStr []string
+	var sortForeignKeys []ForeignKey
+
+	for _, fk := range foreignKeys {
+		fkStr = append(fkStr, fk.ToSQL())
+		fkMap[fk.ToSQL()] = fk
+	}
+
+	sort.Strings(fkStr)
+	for _, key := range fkStr {
+		sortForeignKeys = append(sortForeignKeys, fkMap[key])
+	}
+
+	return sortForeignKeys
 }
 
 // Indexes XXX
