@@ -130,16 +130,16 @@ func (mysql MySQL) TableTemplate() string {
 DROP TABLE IF EXISTS {{ .Name }};
 
 CREATE TABLE {{ .Name }} (
-	{{ range .Columns -}}
-		{{ .ToSQL }},
-	{{ end -}}
-	{{ range .Indexes.Sort -}}
-		{{ .ToSQL }},
-	{{ end -}}
-	{{ range .ForeignKeys.Sort  -}}
-		{{ .ToSQL }},
-	{{ end -}}
-	{{ .PrimaryKey.ToSQL }}
+    {{ range .Columns -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ range .Indexes.Sort -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ range .ForeignKeys.Sort  -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ .PrimaryKey.ToSQL }}
 ) ENGINE={{ .Dialect.Engine }} DEFAULT CHARACTER SET {{ .Dialect.Charset }};
 
 `
