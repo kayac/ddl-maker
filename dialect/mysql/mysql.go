@@ -130,9 +130,9 @@ func (mysql MySQL) TableTemplate() string {
 DROP TABLE IF EXISTS {{ .Name }};
 
 CREATE TABLE {{ .Name }} (
-    {{ range .Columns -}}
+	{{ range .Columns -}}
 		{{ .ToSQL }},
-    {{ end -}}
+	{{ end -}}
 	{{ range .Indexes.Sort -}}
 		{{ .ToSQL }},
 	{{ end -}}
