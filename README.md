@@ -345,3 +345,39 @@ func (b Bookmark) Indexes() dialect.Indexes {
 	}
 }
 ```
+
+## How to Set ForeignKey
+
+Define struct method called `ForeignKeys()`
+
+### Referential Actions Option
+
+| ReferentialActionsOption |                          Method                         |
+|:------------------------:|:-------------------------------------------------------:|
+|        ON UPDATE         | WithUpdateForeignKeyOption(option ForeignKeyOptionType) |
+|        ON DELETE         | WithDeleteForeignKeyOption(option ForeignKeyOptionType) |
+
+|    ForeignKeyOptionType    |    Value    |
+|:--------------------------:|:-----------:|
+|  ForeignKeyOptionCascade   |   CASCADE   |
+|  ForeignKeyOptionSetNull   |   SET NULL  |
+|  ForeignKeyOptionRestrict  |   RESTRICT  |
+|  ForeignKeyOptionNoAction  |  NO ACTION  |
+| ForeignKeyOptionSetDefault | SET DEFAULT |
+
+```go
+func (pc PlayerComment) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
+	}
+}
+```
