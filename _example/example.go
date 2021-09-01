@@ -66,6 +66,21 @@ func (pc PlayerComment) Indexes() dialect.Indexes {
 	}
 }
 
+func (pc PlayerComment) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
+	}
+}
+
 type Bookmark struct {
 	Id        int32     `ddl:"size=100" json:"id"`
 	UserId    int32     `json:"user_id"`
@@ -81,5 +96,20 @@ func (b Bookmark) PrimaryKey() dialect.PrimaryKey {
 func (b Bookmark) Indexes() dialect.Indexes {
 	return dialect.Indexes{
 		mysql.AddUniqueIndex("user_id_entry_id", "user_id", "entry_id"),
+	}
+}
+
+func (b Bookmark) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
 	}
 }
