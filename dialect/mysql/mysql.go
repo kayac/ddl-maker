@@ -75,8 +75,8 @@ type ForeignKey struct {
 	deleteOption       string
 }
 
-// ForeingKeyOption XXX
-type ForeingKeyOption interface {
+// ForeignKeyOption XXX
+type ForeignKeyOption interface {
 	Apply(*ForeignKey)
 }
 
@@ -87,7 +87,7 @@ func (o withUpdateForeignKeyOption) Apply(f *ForeignKey) {
 }
 
 // WithUpdateForeignKeyOption XXX
-func WithUpdateForeignKeyOption(option ForeignKeyOptionType) ForeingKeyOption {
+func WithUpdateForeignKeyOption(option ForeignKeyOptionType) ForeignKeyOption {
 	switch option {
 	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
 	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
@@ -103,7 +103,7 @@ func (o withDeleteForeignKeyOption) Apply(f *ForeignKey) {
 }
 
 // WithDeleteForeignKeyOption XXX
-func WithDeleteForeignKeyOption(option ForeignKeyOptionType) ForeingKeyOption {
+func WithDeleteForeignKeyOption(option ForeignKeyOptionType) ForeignKeyOption {
 	switch option {
 	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
 	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
@@ -420,7 +420,7 @@ func AddPrimaryKey(columns ...string) PrimaryKey {
 }
 
 // AddForeignKey XXX
-func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName string, option ...ForeingKeyOption) ForeignKey {
+func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName string, option ...ForeignKeyOption) ForeignKey {
 	foreingKey := ForeignKey{
 		foreignColumns:     foreignColumns,
 		referenceTableName: referenceTableName,
