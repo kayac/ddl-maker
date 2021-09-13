@@ -421,7 +421,7 @@ func AddPrimaryKey(columns ...string) PrimaryKey {
 
 // AddForeignKey XXX
 func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName string, option ...ForeignKeyOption) ForeignKey {
-	foreingKey := ForeignKey{
+	foreignKey := ForeignKey{
 		foreignColumns:     foreignColumns,
 		referenceTableName: referenceTableName,
 		referenceColumns:   referenceColumns,
@@ -429,11 +429,11 @@ func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName
 
 	for _, o := range option {
 		if o != nil {
-			o.Apply(&foreingKey)
+			o.Apply(&foreignKey)
 		}
 	}
 
-	return foreingKey
+	return foreignKey
 }
 
 func varchar(size uint64) string {
