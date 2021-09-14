@@ -21,7 +21,7 @@ CREATE TABLE `entry` (
     `content` TEXT NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
-    FULLTEXT `full_text_idx` (`content`) WITH PARSER ngram,
+    FULLTEXT `full_text_idx` (`content`) WITH PARSER `ngram`,
     INDEX `created_at_idx` (`created_at`),
     INDEX `title_idx` (`title`),
     UNIQUE `created_at_uniq_idx` (`created_at`),
@@ -39,6 +39,8 @@ CREATE TABLE `player_comment` (
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     INDEX `player_id_entry_id_idx` (`player_id`, `entry_id`),
+    FOREIGN KEY (`entry_id`) REFERENCES `entry` (`id`),
+    FOREIGN KEY (`player_id`) REFERENCES `player` (`id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -52,6 +54,8 @@ CREATE TABLE `bookmark` (
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     UNIQUE `user_id_entry_id` (`user_id`, `entry_id`),
+    FOREIGN KEY (`entry_id`) REFERENCES `entry` (`id`),
+    FOREIGN KEY (`player_id`) REFERENCES `player` (`id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 

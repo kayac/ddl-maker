@@ -21,19 +21,19 @@ import (
 )
 
 type User struct {
-	Id        uint64
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Id                  uint64
+	Name                string
+	CreatedAt           time.Time
+	UpdatedAt           time.Time
 	Token               string `ddl:"-"`
 	DailyNotificationAt string `ddl:"type=time"`
 }
 
-func (u User) Table() string {
+func (u *User) Table() string {
 	return "player"
 }
 
-func (u User) PrimaryKey() dialect.PrimaryKey {
+func (u *User) PrimaryKey() dialect.PrimaryKey {
 	return mysql.AddPrimaryKey("id")
 }
 
@@ -55,6 +55,7 @@ func (e Entry) Indexes() dialect.Indexes {
 		mysql.AddUniqueIndex("created_at_uniq_idx", "created_at"),
 		mysql.AddIndex("title_idx", "title"),
 		mysql.AddIndex("created_at_idx", "created_at"),
+		mysql.AddFullTextIndex("full_text_idx", "content").WithParser("ngram"),
 	}
 }
 
@@ -63,8 +64,8 @@ type PlayerComment struct {
 	PlayerID  int32          `json:"player_id"`
 	EntryID   int32          `json:"entry_id"`
 	Comment   sql.NullString `json:"comment" ddl:"null,size=99"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt time.Time      `json:"created_at"`
+	updatedAt time.Time
 }
 
 func (pc PlayerComment) PrimaryKey() dialect.PrimaryKey {
@@ -74,6 +75,21 @@ func (pc PlayerComment) PrimaryKey() dialect.PrimaryKey {
 func (pc PlayerComment) Indexes() dialect.Indexes {
 	return dialect.Indexes{
 		mysql.AddIndex("player_id_entry_id_idx", "player_id", "entry_id"),
+	}
+}
+
+func (pc PlayerComment) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
 	}
 }
 
@@ -94,6 +110,22 @@ func (b Bookmark) Indexes() dialect.Indexes {
 		mysql.AddUniqueIndex("user_id_entry_id", "user_id", "entry_id"),
 	}
 }
+
+func (b Bookmark) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
+	}
+}
+
 ```
 
 **_example/create_ddl/create_ddl.go**
@@ -199,6 +231,7 @@ CREATE TABLE `entry` (
     `content` TEXT NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
+    FULLTEXT `full_text_idx` (`content`) WITH PARSER `ngram`,
     INDEX `created_at_idx` (`created_at`),
     INDEX `title_idx` (`title`),
     UNIQUE `created_at_uniq_idx` (`created_at`),
@@ -216,6 +249,8 @@ CREATE TABLE `player_comment` (
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     INDEX `player_id_entry_id_idx` (`player_id`, `entry_id`),
+    FOREIGN KEY (`entry_id`) REFERENCES `entry` (`id`),
+    FOREIGN KEY (`player_id`) REFERENCES `player` (`id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
@@ -229,10 +264,13 @@ CREATE TABLE `bookmark` (
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     UNIQUE `user_id_entry_id` (`user_id`, `entry_id`),
+    FOREIGN KEY (`entry_id`) REFERENCES `entry` (`id`),
+    FOREIGN KEY (`player_id`) REFERENCES `player` (`id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARACTER SET utf8mb4;
 
 SET foreign_key_checks=1;
+
 ```
 
 ___
@@ -304,6 +342,42 @@ ex)
 func (b Bookmark) Indexes() dialect.Indexes {
 	return dialect.Indexes{
 		mysql.AddUniqueIndex("user_id_entry_id", "user_id", "entry_id"),
+	}
+}
+```
+
+## How to Set ForeignKey
+
+Define struct method called `ForeignKeys()`
+
+### Referential Actions Option
+
+| ReferentialActionsOption |                          Method                         |
+|:------------------------:|:-------------------------------------------------------:|
+|        ON UPDATE         | WithUpdateForeignKeyOption(option ForeignKeyOptionType) |
+|        ON DELETE         | WithDeleteForeignKeyOption(option ForeignKeyOptionType) |
+
+|    ForeignKeyOptionType    |    Value    |
+|:--------------------------:|:-----------:|
+|  ForeignKeyOptionCascade   |   CASCADE   |
+|  ForeignKeyOptionSetNull   |   SET NULL  |
+|  ForeignKeyOptionRestrict  |   RESTRICT  |
+|  ForeignKeyOptionNoAction  |  NO ACTION  |
+| ForeignKeyOptionSetDefault | SET DEFAULT |
+
+```go
+func (pc PlayerComment) ForeignKeys() dialect.ForeignKeys {
+	return dialect.ForeignKeys{
+		mysql.AddForeignKey(
+			[]string{"player_id"},
+			[]string{"id"},
+			"player",
+		),
+		mysql.AddForeignKey(
+			[]string{"entry_id"},
+			[]string{"id"},
+			"entry",
+		),
 	}
 }
 ```

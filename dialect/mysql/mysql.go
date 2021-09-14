@@ -48,6 +48,70 @@ type PrimaryKey struct {
 	columns []string
 }
 
+// ForeignKeyOptionType XXX
+type ForeignKeyOptionType string
+
+// ForeignKeyOptionCascade CASCADE
+var ForeignKeyOptionCascade ForeignKeyOptionType = "CASCADE"
+
+// ForeignKeyOptionSetNull SET NULL
+var ForeignKeyOptionSetNull ForeignKeyOptionType = "SET NULL"
+
+// ForeignKeyOptionRestrict RESTRICT
+var ForeignKeyOptionRestrict ForeignKeyOptionType = "RESTRICT"
+
+// ForeignKeyOptionNoAction NO ACTION
+var ForeignKeyOptionNoAction ForeignKeyOptionType = "NO ACTION"
+
+// ForeignKeyOptionSetDefault SET DEFAULT
+var ForeignKeyOptionSetDefault ForeignKeyOptionType = "SET DEFAULT"
+
+// ForeignKey XXX
+type ForeignKey struct {
+	foreignColumns     []string
+	referenceTableName string
+	referenceColumns   []string
+	updateOption       string
+	deleteOption       string
+}
+
+// ForeignKeyOption XXX
+type ForeignKeyOption interface {
+	Apply(*ForeignKey)
+}
+
+type withUpdateForeignKeyOption string
+
+func (o withUpdateForeignKeyOption) Apply(f *ForeignKey) {
+	f.updateOption = string(o)
+}
+
+// WithUpdateForeignKeyOption XXX
+func WithUpdateForeignKeyOption(option ForeignKeyOptionType) ForeignKeyOption {
+	switch option {
+	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
+	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
+		return withUpdateForeignKeyOption("")
+	}
+	return withUpdateForeignKeyOption(option)
+}
+
+type withDeleteForeignKeyOption string
+
+func (o withDeleteForeignKeyOption) Apply(f *ForeignKey) {
+	f.deleteOption = string(o)
+}
+
+// WithDeleteForeignKeyOption XXX
+func WithDeleteForeignKeyOption(option ForeignKeyOptionType) ForeignKeyOption {
+	switch option {
+	// Specifying RESTRICT (or NO ACTION) is the same as omitting the ON DELETE or ON UPDATE clause.
+	case ForeignKeyOptionRestrict, ForeignKeyOptionNoAction:
+		return withDeleteForeignKeyOption("")
+	}
+	return withDeleteForeignKeyOption(option)
+}
+
 // HeaderTemplate XXX
 func (mysql MySQL) HeaderTemplate() string {
 	return `SET foreign_key_checks=0;
@@ -66,9 +130,16 @@ func (mysql MySQL) TableTemplate() string {
 DROP TABLE IF EXISTS {{ .Name }};
 
 CREATE TABLE {{ .Name }} (
-    {{ range .Columns }}{{ .ToSQL }},
-    {{ end }}{{ range .Indexes.Sort  }}{{ .ToSQL }},
-    {{end}}{{ .PrimaryKey.ToSQL }}
+    {{ range .Columns -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ range .Indexes.Sort -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ range .ForeignKeys.Sort  -}}
+        {{ .ToSQL }},
+    {{ end -}}
+    {{ .PrimaryKey.ToSQL }}
 ) ENGINE={{ .Dialect.Engine }} DEFAULT CHARACTER SET {{ .Dialect.Charset }};
 
 `
@@ -261,6 +332,54 @@ func (pk PrimaryKey) ToSQL() string {
 	return fmt.Sprintf("PRIMARY KEY (%s)", strings.Join(columnsStr, ", "))
 }
 
+// ForeignColumns XXX
+func (fk ForeignKey) ForeignColumns() []string {
+	return fk.foreignColumns
+}
+
+// ReferenceTableName XXX
+func (fk ForeignKey) ReferenceTableName() string {
+	return fk.referenceTableName
+}
+
+// ReferenceColumns XXX
+func (fk ForeignKey) ReferenceColumns() []string {
+	return fk.referenceColumns
+}
+
+// UpdateOption XXX
+func (fk ForeignKey) UpdateOption() string {
+	return fk.updateOption
+}
+
+// DeleteOption XXX
+func (fk ForeignKey) DeleteOption() string {
+	return fk.deleteOption
+}
+
+// ToSQL return foreign key sql string
+func (fk ForeignKey) ToSQL() string {
+	var foreignColumnsStr, referenceColumnsStr []string
+	for _, fc := range fk.foreignColumns {
+		foreignColumnsStr = append(foreignColumnsStr, quote(fc))
+	}
+	for _, rc := range fk.referenceColumns {
+		referenceColumnsStr = append(referenceColumnsStr, quote(rc))
+	}
+	sql := fmt.Sprintf("FOREIGN KEY (%s) REFERENCES %s (%s)",
+		strings.Join(foreignColumnsStr, ", "),
+		quote(fk.referenceTableName),
+		strings.Join(referenceColumnsStr, ", "))
+	if fk.deleteOption != "" {
+		sql = sql + fmt.Sprintf(" ON DELETE %s", fk.deleteOption)
+	}
+	if fk.updateOption != "" {
+		sql = sql + fmt.Sprintf(" ON UPDATE %s", fk.updateOption)
+	}
+	return sql
+
+}
+
 // AddIndex XXX
 func AddIndex(idxName string, columns ...string) Index {
 	return Index{
@@ -298,6 +417,23 @@ func AddPrimaryKey(columns ...string) PrimaryKey {
 	return PrimaryKey{
 		columns: columns,
 	}
+}
+
+// AddForeignKey XXX
+func AddForeignKey(foreignColumns, referenceColumns []string, referenceTableName string, option ...ForeignKeyOption) ForeignKey {
+	foreignKey := ForeignKey{
+		foreignColumns:     foreignColumns,
+		referenceTableName: referenceTableName,
+		referenceColumns:   referenceColumns,
+	}
+
+	for _, o := range option {
+		if o != nil {
+			o.Apply(&foreignKey)
+		}
+	}
+
+	return foreignKey
 }
 
 func varchar(size uint64) string {
