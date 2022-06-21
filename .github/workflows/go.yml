@@ -18,12 +18,23 @@ jobs:
       fail-fast: false
     steps:
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go }}
 
       - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          path: src/github.com/kayac/ddl-maker
+          persist-credentials: false
+
+      - run: |
+          go version
+          echo "GO111MODULE=on" >> "$GITHUB_ENV"
+          echo "GOPATH=${{ github.workspace }}" >> "$GITHUB_ENV"
+          echo "${{ github.workspace }}/bin" >> "$GITHUB_PATH"
+        shell: bash
 
       - name: Test
         run: make test
+        working-directory: src/github.com/kayac/ddl-maker
